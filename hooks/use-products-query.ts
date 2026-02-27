@@ -28,9 +28,9 @@ export function useProductsQuery({
     queryFn: async () => {
       const data = await fetchProducts({ sort, search, page, id, category });
 
-      const hasPriceFilter = min || max;
+      // const hasPriceFilter = min || max;
 
-      if (!inStock && !hasPriceFilter) return data;
+      if (!inStock) return data;
 
       const all = await fetchProducts({
         sort,
@@ -44,7 +44,7 @@ export function useProductsQuery({
       const totalFiltered = all.products.filter((p: Product) => {
         if (inStock && p.stock <= 0) return false;
 
-        if (hasPriceFilter && (p.price < min || p.price > max)) return false;
+        // if (hasPriceFilter && (p.price < min || p.price > max)) return false;
 
         return true;
       }).length;
