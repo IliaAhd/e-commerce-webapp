@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
+import { INPUT } from "@/lib/constants";
 
 export function useProductsParams() {
   const router = useRouter();
@@ -11,6 +12,8 @@ export function useProductsParams() {
   const inStock = searchParams.get("inStock") === "true" ? true : false;
   const page = searchParams.get("page") ?? "1";
   const category = searchParams.get("category") ?? "";
+  const min = searchParams.get("min") ? +searchParams.get("min")! : INPUT[0];
+  const max = searchParams.get("max") ? +searchParams.get("max")! : INPUT[1];
 
   const params = new URLSearchParams(searchParams.toString());
 
@@ -35,6 +38,12 @@ export function useProductsParams() {
     updateParams("inStock", inStock.toString());
   }
 
+  function updatePriceRange(min: number, max: number) {
+    updatePage(1);
+    updateParams("min", String(min));
+    updateParams("max", String(max));
+  }
+
   function updatePage(page: number) {
     updateParams("page", page.toString());
   }
@@ -54,5 +63,8 @@ export function useProductsParams() {
     page,
     category,
     updateCategory,
+    min,
+    max,
+    updatePriceRange,
   };
 }

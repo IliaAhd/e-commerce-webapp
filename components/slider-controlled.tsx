@@ -1,12 +1,20 @@
 "use client";
 
-import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group";
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+} from "@/components/ui/input-group";
 import { Slider } from "@/components/ui/slider";
+import { useProducts } from "@/contexts/products-context";
 import { INPUT } from "@/lib/constants";
-import { useState } from "react";
 
 export function SliderControlled() {
-  const [value, setValue] = useState(INPUT);
+  const {
+    range,
+    setRange,
+    params: { updatePriceRange },
+  } = useProducts();
 
   return (
     <div className="mx-auto grid  gap-3">
@@ -14,8 +22,8 @@ export function SliderControlled() {
         <span>
           <InputGroup>
             <InputGroupInput
-              value={value[0]}
-              onChange={(e) => setValue((val) => [+e.target.value, val[1]])}
+              value={range[0]}
+              onChange={(e) => setRange((val) => [+e.target.value, val[1]])}
               placeholder="19"
             />
             <InputGroupAddon>$</InputGroupAddon>
@@ -24,8 +32,8 @@ export function SliderControlled() {
         <span>
           <InputGroup>
             <InputGroupInput
-              value={value[1]}
-              onChange={(e) => setValue((val) => [val[0], +e.target.value])}
+              value={range[1]}
+              onChange={(e) => setRange((val) => [val[0], +e.target.value])}
               placeholder="200"
             />
             <InputGroupAddon>$</InputGroupAddon>
@@ -34,8 +42,9 @@ export function SliderControlled() {
       </div>
       <Slider
         id="slider-demo-temperature"
-        value={value}
-        onValueChange={setValue}
+        value={range}
+        onValueChange={setRange}
+        onValueCommit={(val) => updatePriceRange(val[0], val[1])}
         min={INPUT[0]}
         max={INPUT[1]}
         step={1}

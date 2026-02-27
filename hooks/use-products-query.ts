@@ -1,7 +1,7 @@
 "use client";
 
 import { fetchProducts } from "@/lib/fetchProducts";
-import { ProductsResponse } from "@/types/product";
+import { Product, ProductsResponse } from "@/types/product";
 import { useQuery } from "@tanstack/react-query";
 
 export function useProductsQuery({
@@ -11,6 +11,8 @@ export function useProductsQuery({
   page,
   category,
   inStock,
+  min,
+  max,
 }: {
   id?: string;
   sort?: string;
@@ -18,20 +20,55 @@ export function useProductsQuery({
   page?: string;
   category?: string;
   inStock?: boolean;
+  min?: number;
+  max?: number;
 }) {
   return useQuery<ProductsResponse>({
-    queryKey: ["products", sort, search, inStock, page, id, category],
-    queryFn: () => fetchProducts({ sort, search, page, id, category }),
+    queryKey: ["products", sort, search, inStock, page, id, category, min, max],
+    queryFn: async () => {
+      const data = await fetchProducts({ sort, search, page, id, category });
+
+      const hasPriceFilter = min && max;
+
+      if (!inStock && !hasPriceFilter) return data;
+
+      const all = await fetchProducts({
+        sort,
+        search,
+        page: "1",
+        id,
+        category,
+        limit: data.total,
+      });
+
+      const totalFiltered = all.products.filter((p: Product) => {
+        if (inStock && p.stock <= 0) return false;
+
+        if (hasPriceFilter && (p.price < min || p.price > max)) return false;
+
+        return true;
+      }).length;
+
+      return { ...data, total: totalFiltered };
+    },
     select: (data) => {
       const newData = { ...data };
 
-      if (inStock)
-        return {
-          ...newData,
-          products: newData.products.filter((product) => product.stock > 0),
-        };
+      const hasPriceFilter = min && max;
 
-      return newData;
+      let products = newData.products;
+
+      if (inStock) products = products.filter((product) => product.stock > 0);
+
+      if (hasPriceFilter)
+        products = products.filter(
+          (product) => product.price >= min && product.price <= max,
+        );
+
+      return {
+        ...newData,
+        products,
+      };
     },
   });
 }

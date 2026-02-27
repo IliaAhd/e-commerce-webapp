@@ -60,6 +60,7 @@ export default function Filters() {
             { value: "iPhone", label: "iphone" },
             { value: "samsung", label: "Samsung" },
           ]}
+          disabled
         />
 
         <Dropdown triggerTitle="Price" title="Filter by price range">

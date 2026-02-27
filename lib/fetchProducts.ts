@@ -7,12 +7,14 @@ export async function fetchProducts({
   page = "1",
   id,
   category,
+  limit = LIMIT,
 }: {
   sort?: string;
   search?: string;
   page?: string;
   id?: string;
   category?: string;
+  limit?: number;
 }) {
   const params = new URLSearchParams();
 
@@ -21,21 +23,21 @@ export async function fetchProducts({
   if (sortBy) params.set("sortBy", sortBy);
   if (order) params.set("order", order);
   if (search) params.set("q", search);
-  if (page) params.set("page", page);
   if (category === "all") category = "";
 
-  const skip = (+page - 1) * LIMIT;
+  const skip = (+page - 1) * limit;
 
   const baseUrl = "https://dummyjson.com/products";
-  const separator = baseUrl.includes("?") ? "&" : "?";
-  const limit = `&limit=${LIMIT}&skip=${skip}`;
+  const limitParam = `&limit=${limit}&skip=${skip}`;
 
   let url;
-  if (category)
-    url = `${baseUrl}/category/${category}${separator}${params.toString()}${limit}`;
-  else if (id) url = `${baseUrl}/${id}`;
-  else
-    url = `${baseUrl}${search && "/search"}${separator}${params.toString()}${limit}`;
+  if (category) {
+    url = `${baseUrl}/category/${category}?${params.toString()}${limitParam}`;
+  } else if (id) {
+    url = `${baseUrl}/${id}`;
+  } else {
+    url = `${baseUrl}${search && "/search"}?${params.toString()}${limitParam}`;
+  }
 
   const res = await fetch(url);
 
