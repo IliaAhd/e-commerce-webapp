@@ -11,8 +11,8 @@ export function useProductsQuery({
   page,
   category,
   inStock,
-  min,
-  max,
+  min = 0,
+  max = 50000,
 }: {
   id?: string;
   sort?: string;
@@ -28,7 +28,7 @@ export function useProductsQuery({
     queryFn: async () => {
       const data = await fetchProducts({ sort, search, page, id, category });
 
-      const hasPriceFilter = min && max;
+      const hasPriceFilter = min || max;
 
       if (!inStock && !hasPriceFilter) return data;
 
@@ -52,21 +52,20 @@ export function useProductsQuery({
       return { ...data, total: totalFiltered };
     },
     select: (data) => {
-      const newData = { ...data };
+      let products = data.products;
 
-      const hasPriceFilter = min && max;
+      if (inStock) {
+        products = products.filter((p) => p.stock > 0);
+      }
 
-      let products = newData.products;
-
-      if (inStock) products = products.filter((product) => product.stock > 0);
-
-      if (hasPriceFilter)
-        products = products.filter(
-          (product) => product.price >= min && product.price <= max,
-        );
+      if (min !== undefined && max !== undefined) {
+        products = products
+          .filter((p) => p.price >= min && p.price <= max)
+          .sort((a, b) => a.price - b.price);
+      }
 
       return {
-        ...newData,
+        ...data,
         products,
       };
     },
