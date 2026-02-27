@@ -58,11 +58,11 @@ export function useProductsQuery({
         products = products.filter((p) => p.stock > 0);
       }
 
-      if (min !== undefined && max !== undefined) {
-        products = products
-          .filter((p) => p.price >= min && p.price <= max)
-          .sort((a, b) => a.price - b.price);
-      }
+      // if (min !== undefined && max !== undefined) {
+      //   products = products
+      //     .filter((p) => p.price >= min && p.price <= max)
+      //     .sort((a, b) => a.price - b.price);
+      // }
 
       return {
         ...data,

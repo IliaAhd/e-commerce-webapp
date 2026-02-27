@@ -34,19 +34,19 @@ export function ProductsProvider({ children }: { children: React.ReactNode }) {
     category: params.category,
     page: params.page,
     sort: params.sort,
-    min: params.min,
-    max: params.max,
+    // min: params.min,
+    // max: params.max,
   });
   const [range, setRange] = useState(INPUT);
 
-  useEffect(() => {
-    const timer = setTimeout(
-      () => params.updatePriceRange(range[0], range[1]),
-      1000,
-    );
+  // useEffect(() => {
+  //   const timer = setTimeout(
+  //     () => params.updatePriceRange(range[0], range[1]),
+  //     1000,
+  //   );
 
-    return () => clearTimeout(timer);
-  }, [range]);
+  //   return () => clearTimeout(timer);
+  // }, [range]);
 
   return (
     <ProductsContext.Provider
